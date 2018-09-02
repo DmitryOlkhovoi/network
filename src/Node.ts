@@ -17,6 +17,7 @@ class Node {
   static MINIMAL_DISTANCE = 1;
 
   place: number;
+  activity: number = 0;
   connectionsIN: ConnectionIN[] = [];
   connectionsOUT: ConnectionOUT[] = [];
 
