@@ -9,8 +9,4 @@ class DataNode extends Node {
 
     this.data = data;
   }
-
-  isOutput() {
-    return !!this.connectionsIN.length
-  }
 }

@@ -19,7 +19,7 @@ import Node from "./Node";
  * @param valueToFind 
  * @returns  
  */
-export default function findClosesPath(startNode: Node, valueToFind: number) {
+export default function findClosesPath(startNode: Node, valueToFind: number): [Node[], number] {
   /**
    * If found is true - stop searching
    */
@@ -120,5 +120,5 @@ export default function findClosesPath(startNode: Node, valueToFind: number) {
   result.unshift(foundedNode!);
 
   // * From start to end
-  return result.reverse();
+  return [result.reverse(), nodeToNodeDistance.get(currentNode!)!];
 }

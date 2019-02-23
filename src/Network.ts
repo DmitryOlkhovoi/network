@@ -1,11 +1,12 @@
 import _ from 'underscore';
-import Node, { CONNECTION_TYPE } from './Node';
+import Node from './Node';
 import DataNode from './DataNode';
+import findClosesPath from "./dijkstra";
+import { shorterDistanceIn } from './modifiers';
 
 export interface Layer {
   nodes: Node[],
 }
-
 
 /**
  * Network
@@ -32,8 +33,7 @@ class Network {
 
       lastLayer.nodes.forEach(node => {
         layer.nodes.forEach((nodeToConnect) => {
-          node.addConnection(CONNECTION_TYPE.OUT, nodeToConnect);
-          nodeToConnect.addConnection(CONNECTION_TYPE.IN, node);
+          node.connect(nodeToConnect);
         })
       });
     }
@@ -109,5 +109,57 @@ class Network {
    */
   addDataLayer(data: number[], size: number = data.length) {
     this.addLayer(this.makeDataLayer(size, data));
+  }
+
+  fillInput(data: number[]) {
+    const nodes = this.layers[0].nodes as DataNode[];
+
+    nodes.forEach((node, i) => {
+      node.data = data[i] || 0;
+    });
+  }
+
+  train(outputValue: number, reverse = false) {
+    const nodes = (reverse ? this.layers[0].nodes.reverse() : this.layers[0].nodes) as DataNode[];
+
+    nodes.forEach(node => {
+      if (!node.data) {
+        return;
+      }
+
+      const [path] = findClosesPath(node, outputValue)
+
+      shorterDistanceIn(
+        path,
+      );
+    });
+  }
+
+  predict() {
+    const inputNodes = this.layers[0].nodes as DataNode[];
+    const outputNodes = this.layers[this.layers.length -1].nodes as DataNode[];
+
+    inputNodes.forEach(inputNode => {
+      if (!inputNode.data) {
+        return;
+      }
+
+      const results: any = [];
+      let minResult: any = null;
+
+      outputNodes.forEach(outputNode => {
+        results.push(findClosesPath(inputNode, outputNode.data));
+      })
+
+      minResult = results[1];
+
+      results.forEach((result: any) => {
+        if (result[1] < minResult[1]) {
+          minResult = result;
+        }
+      });
+
+      minResult[0][minResult[0].length - 1].hits += 1;
+    })
   }
 }
